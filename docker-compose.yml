@@ -1,0 +1,39 @@
+services:
+  jenkins:
+    image: jenkins-with-docker-cli
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    group_add:
+     - "124"
+    restart: unless-stopped
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:8
+    container_name: mysql-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - backend
+
+volumes:
+  jenkins_home:
+  mysql_data:
+
+networks:
+  backend:
+    driver: bridge
